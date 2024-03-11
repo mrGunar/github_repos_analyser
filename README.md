@@ -17,3 +17,15 @@ pipenv install
 pipenv shell
 python app.py
 ```
+ ### Arguments
+
+ ```
+ python app.py -h
+
+ usage: app.py [-h] [--date_from DATE_FROM]
+
+options:
+  -h, --help            show this help message and exit
+  --date_from DATE_FROM The Start Date - format YYYY-MM-DD
+ ```
+ If the date_from parameter is not passed, the date will be calculated as the current date minus one day.
