@@ -1,4 +1,6 @@
+import datetime as dt
 import typing as tp
+import argparse
 
 from github import GithubException
 
@@ -29,7 +31,11 @@ def analyse_files_from_commit(files: tp.Iterable) -> dto.CommitStat:
     return stats
 
 
-def get_all_commits(user_login, user_repos):
+def get_all_commits(
+    user_login,
+    user_repos,
+    date_from: dt.date,
+):
     for repo in user_repos:
         repo_name = repo.full_name
 
@@ -54,4 +60,23 @@ def get_all_commits(user_login, user_repos):
                 if commit_author != user_login:
                     continue
 
-            yield commit
+            if commit.last_modified_datetime >= date_from:
+                yield commit
+
+
+def valid_date(s: str) -> dt.datetime:
+    try:
+        return dt.datetime.strptime(s, "%Y-%m-%d").replace(tzinfo=dt.timezone.utc)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"not a valid date: {s!r}")
+
+
+def parse_args():
+    args = argparse.ArgumentParser()
+    args.add_argument(
+        "--date_from",
+        help="The Start Date - format YYYY-MM-DD ",
+        required=False,
+        type=valid_date,
+    )
+    return args.parse_args()
